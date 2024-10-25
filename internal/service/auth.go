@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/Eagoker/todo-list"
-	"github.com/Eagoker/todo-list/pkg/repository"
+	"github.com/Eagoker/todo-list/internal/repository"
 	"github.com/dgrijalva/jwt-go"
 )
 

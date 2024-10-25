@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/Eagoker/todo-list"
-	"github.com/Eagoker/todo-list/pkg/repository"
+	"github.com/Eagoker/todo-list/internal/repository"
 )
 
 type TodoListService struct {

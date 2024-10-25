@@ -7,9 +7,9 @@ import (
 	"syscall"
 
 	"github.com/Eagoker/todo-list"
-	"github.com/Eagoker/todo-list/pkg/handler"
-	"github.com/Eagoker/todo-list/pkg/repository"
-	"github.com/Eagoker/todo-list/pkg/service"
+	"github.com/Eagoker/todo-list/internal/handler"
+	"github.com/Eagoker/todo-list/internal/repository"
+	"github.com/Eagoker/todo-list/internal/service"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
