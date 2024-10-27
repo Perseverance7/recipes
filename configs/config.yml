@@ -5,3 +5,4 @@ db:
   user: "anton"
   dbname: "recipes_db"
   sslmode: "disable"
+
