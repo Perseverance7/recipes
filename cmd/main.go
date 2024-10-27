@@ -1,13 +1,13 @@
 package main
 
 import (
-
-	"os"
-
 	"github.com/Eagoker/recipes"
 	"github.com/Eagoker/recipes/internal/handler"
 	"github.com/Eagoker/recipes/internal/repository"
 	"github.com/Eagoker/recipes/internal/service"
+	
+	"os"
+
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
