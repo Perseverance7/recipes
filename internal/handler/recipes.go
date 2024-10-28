@@ -7,17 +7,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type CreateRecipeRequest struct {
-	Recipe        recipes.Recipe            `json:"recipe"`
-	Ingredients  []recipes.Ingredient      `json:"ingredients"`
-}
-
 func (h *Handler) createRecipe(c *gin.Context){
 	userId, err := getUserId(c)
 	if err != nil {
 		return
 	}
-	var input CreateRecipeRequest
+
+	var input recipes.FullRecipe
 	if err := c.BindJSON(&input); err != nil {
 		NewErrorResponce(c, http.StatusInternalServerError, err.Error())
 		return
@@ -36,7 +32,14 @@ func (h *Handler) createRecipe(c *gin.Context){
 }
 
 func (h *Handler) getAllRecipes(c *gin.Context){
-	
+	fullRecipes, err := h.services.Recipe.GetAllRecipes()
+	if err != nil {
+		NewErrorResponce(c, http.StatusInternalServerError, "Не удалось получить рецепты")
+		return
+	}
+
+	// Возвращаем JSON ответ
+	c.JSON(http.StatusOK, fullRecipes)
 }
 
 func (h *Handler) getRecipeById(c *gin.Context){

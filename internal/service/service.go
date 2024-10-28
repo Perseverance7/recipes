@@ -12,7 +12,8 @@ type Authorization interface{
 }
 
 type Recipe interface{
-	CreateRecipe(recipe recipes.Recipe, ingredients []recipes.Ingredient) (int, error) 
+	CreateRecipe(recipe recipes.Recipe, ingredients []recipes.Ingredient) (int, error)
+	GetAllRecipes() (*[]recipes.SimplifiedRecipe, error) 
 }
 
 type Service struct{

@@ -45,30 +45,30 @@ func (r *RecipesPostgres) CreateRecipe(recipe recipes.Recipe, ingredients []reci
 	for _, ingredient := range ingredients {
 		var ingredientID int
 
-		// Проверяем, существует ли ингредиент
-		err = tx.QueryRow(
-			"SELECT id FROM ingredients WHERE name = $1",
-			ingredient.Name,
-		).Scan(&ingredientID)
+		// Проверяем, существует ли 
+		query := fmt.Sprintf("SELECT id FROM %s WHERE name = $1", ingredientsTable)
+		err = tx.QueryRow(query,ingredient.Name).Scan(&ingredientID)
 
 		if err == sql.ErrNoRows {
 			// Если ингредиент не существует, добавляем его
-			err = tx.QueryRow(
-				"INSERT INTO ingredients (name, unit_id) VALUES ($1, $2) RETURNING id",
-				ingredient.Name, ingredient.UnitID,
-			).Scan(&ingredientID)
+			query := fmt.Sprintf("INSERT INTO %s (name, unit_id) VALUES ($1, $2) RETURNING id", ingredientsTable)
+			err = tx.QueryRow(query, ingredient.Name, ingredient.UnitID).Scan(&ingredientID)
+
 			if err != nil {
 				return 0, err
 			}
+
 		} else if err != nil {
 			return 0, err
 		}
 
 		// Добавляем ингредиент в recipe_ingredients
+		query = fmt.Sprintf("INSERT INTO %s (recipe_id, ingredient_id, quantity) VALUES ($1, $2, $3)", recipesIngredientsTable)
 		_, err = tx.Exec(
-			"INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES ($1, $2, $3)",
+			query,
 			recipeID, ingredientID, ingredient.Quantity,
 		)
+
 		if err != nil {
 			return 0, err
 		}
@@ -76,5 +76,45 @@ func (r *RecipesPostgres) CreateRecipe(recipe recipes.Recipe, ingredients []reci
 
 	return recipeID, nil
 }
+
+func (r *RecipesPostgres) GetAllRecipes() (*[]recipes.SimplifiedRecipe, error) {
+	var simplifiedRecipes []recipes.SimplifiedRecipe
+
+	// Запрос на выборку всех рецептов с их именами и user ID
+	query := fmt.Sprintf(`
+	SELECT 
+		r.name, r.user_id
+	FROM 
+		%s AS r;
+	`, recipesTable)
+
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var recipeName string
+		var userID int
+
+		err := rows.Scan(&recipeName, &userID)
+		if err != nil {
+			return nil, err
+		}
+
+		simplifiedRecipes = append(simplifiedRecipes, recipes.SimplifiedRecipe{
+			Name:   recipeName,
+			UserID: userID,
+		})
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &simplifiedRecipes, nil
+}
+
 
 

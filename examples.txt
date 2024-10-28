@@ -1,0 +1,30 @@
+// POST create recipe
+{
+    "recipe": {
+      "name": "Томатный суп",
+      "instructions": "Проварить помидоры с овощами, добавить специи и пюрировать."
+    },
+    "ingredients": [
+      {
+        "name": "Помидоры",
+        "quantity": 500.0,
+        "unit_id": 1
+      },
+      {
+        "name": "Лук",
+        "quantity": 100.0,
+        "unit_id": 1
+      },
+      {
+        "name": "Чеснок",
+        "quantity": 10.0,
+        "unit_id": 1
+      },
+      {
+        "name": "Оливковое масло",
+        "quantity": 20.0,
+        "unit_id": 2
+      }
+    ]
+  }
+  

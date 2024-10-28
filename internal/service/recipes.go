@@ -25,3 +25,7 @@ func (s *RecipesService) CreateRecipe(recipe recipes.Recipe, ingredients []recip
 
 	return s.repo.CreateRecipe(recipe, ingredients)
 }
+
+func (s *RecipesService) GetAllRecipes() (*[]recipes.SimplifiedRecipe, error) {
+	return s.repo.GetAllRecipes()
+}

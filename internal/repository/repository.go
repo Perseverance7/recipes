@@ -13,6 +13,7 @@ type Authorization interface{
 
 type Recipe interface{
 	CreateRecipe(recipe recipes.Recipe, ingredients []recipes.Ingredient) (int, error) 
+	GetAllRecipes() (*[]recipes.SimplifiedRecipe, error)
 }
 
 type Repository struct{
