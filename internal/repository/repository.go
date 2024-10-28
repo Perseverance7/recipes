@@ -14,6 +14,9 @@ type Authorization interface{
 type Recipe interface{
 	CreateRecipe(recipe recipes.Recipe, ingredients []recipes.Ingredient) (int, error) 
 	GetAllRecipes() (*[]recipes.SimplifiedRecipe, error)
+	GetRecipeById(id int) (recipes.FullRecipe, error)
+	SaveRecipeToProfile(userId, recipeId int) error
+	GetSavedRecipes(userId int) ([]string,error)
 }
 
 type Repository struct{

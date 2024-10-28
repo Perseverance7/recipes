@@ -29,3 +29,15 @@ func (s *RecipesService) CreateRecipe(recipe recipes.Recipe, ingredients []recip
 func (s *RecipesService) GetAllRecipes() (*[]recipes.SimplifiedRecipe, error) {
 	return s.repo.GetAllRecipes()
 }
+
+func (s *RecipesService) GetRecipeById(id int) (recipes.FullRecipe, error) {
+	return s.repo.GetRecipeById(id)
+}
+
+func (s *RecipesService) SaveRecipeToProfile(userId, recipeId int) error {
+	return s.repo.SaveRecipeToProfile(userId, recipeId)
+}
+
+func (s *RecipesService) GetSavedRecipes(userId int) ([]string, error) {
+	return s.repo.GetSavedRecipes(userId)
+}

@@ -11,13 +11,13 @@ func (h *Handler) signUp(c *gin.Context){
 	var input recipes.User
 
 	if err := c.BindJSON(&input); err != nil{
-		NewErrorResponce(c, http.StatusBadRequest, err.Error())
+		newErrorResponce(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	id, err := h.services.Authorization.CreateUser(input)
 	if err != nil{
-		NewErrorResponce(c, http.StatusInternalServerError, err.Error())
+		newErrorResponce(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -35,13 +35,13 @@ type signInInput struct{
 func (h *Handler) signIn(c *gin.Context){
 	var input signInInput
 	if err := c.BindJSON(&input); err != nil{
-		NewErrorResponce(c, http.StatusBadRequest, err.Error())
+		newErrorResponce(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	token, err := h.services.GenerateToken(input.Username, input.Password)
 	if err != nil {
-		NewErrorResponce(c, http.StatusInternalServerError, err.Error())
+		newErrorResponce(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 

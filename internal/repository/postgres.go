@@ -14,7 +14,7 @@ const (
 	recipesTable = "recipes"
 	recipesIngredientsTable = "recipe_ingredients"
 	userIngredientsTable = "user_ingredients"
-	savedRecipes = "saved_recipes"
+	savedRecipesTable = "saved_recipes"
 )
 
 type Config struct{

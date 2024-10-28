@@ -2,7 +2,9 @@ package handler
 
 import (
 	"github.com/Eagoker/recipes"
+
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +17,7 @@ func (h *Handler) createRecipe(c *gin.Context){
 
 	var input recipes.FullRecipe
 	if err := c.BindJSON(&input); err != nil {
-		NewErrorResponce(c, http.StatusInternalServerError, err.Error())
+		newErrorResponce(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -23,7 +25,7 @@ func (h *Handler) createRecipe(c *gin.Context){
 
 	recipeID, err := h.services.Recipe.CreateRecipe(input.Recipe, input.Ingredients)
 	if err != nil {
-		NewErrorResponce(c, http.StatusInternalServerError, err.Error())
+		newErrorResponce(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -34,7 +36,7 @@ func (h *Handler) createRecipe(c *gin.Context){
 func (h *Handler) getAllRecipes(c *gin.Context){
 	fullRecipes, err := h.services.Recipe.GetAllRecipes()
 	if err != nil {
-		NewErrorResponce(c, http.StatusInternalServerError, "Не удалось получить рецепты")
+		newErrorResponce(c, http.StatusInternalServerError, "Не удалось получить рецепты")
 		return
 	}
 
@@ -42,8 +44,55 @@ func (h *Handler) getAllRecipes(c *gin.Context){
 	c.JSON(http.StatusOK, fullRecipes)
 }
 
+func (h *Handler) SaveRecipeToProfile(c *gin.Context){
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+
+	recipeId, err := strconv.Atoi(c.Param("id"))
+	if err != nil{
+		newErrorResponce(c, http.StatusBadRequest, "invalid id param")
+		return
+	}
+
+	if err := h.services.Recipe.SaveRecipeToProfile(userId, recipeId); err != nil{
+		newErrorResponce(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "recipe saved to profile successfully"})
+}
+
 func (h *Handler) getRecipeById(c *gin.Context){
-	
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil{
+		newErrorResponce(c, http.StatusBadRequest, "invalid id param")
+		return
+	}
+
+	recipe, err := h.services.Recipe.GetRecipeById(id)
+	if err != nil{
+		newErrorResponce(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, recipe)
+}
+
+func (h *Handler) getSavedRecipes(c *gin.Context){
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+
+	recipes, err := h.services.Recipe.GetSavedRecipes(userId)
+	if err != nil{
+		newErrorResponce(c, http.StatusInternalServerError, err.Error())
+	}
+
+	c.JSON(http.StatusOK, recipes)
 }
 
 func (h *Handler) updateRecipe(c *gin.Context){
