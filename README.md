@@ -13,7 +13,7 @@ Recipe Finder — это приложение, которое помогает �
 
 ## Стек технологий
 
-- **Backend**: Go (Gin, PostgreSQL)
+- **Backend**: Go (Gin)
 - **Database**: PostgreSQL
 
 
