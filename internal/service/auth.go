@@ -1,11 +1,11 @@
 package service
 
 import (
-	"os"
-
 	"github.com/Eagoker/recipes"
 	"github.com/Eagoker/recipes/internal/repository"
 
+	"os"
+	"errors"
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
@@ -69,6 +69,27 @@ func (a *AuthService) GenerateToken(username, password string) (string, error) {
 		return token.SignedString([]byte(signingKey))
 	}
 	
+}
+
+func(a *AuthService) ParseToken(accessToken string) (int, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &TokenClaims{}, func(token *jwt.Token) (interface{}, error){
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("invalid signing method")
+		}
+
+		return []byte(signingKey), nil
+	})
+
+	if err != nil {
+		return 0, err
+	}
+
+	claims, ok := token.Claims.(*TokenClaims)
+	if !ok {
+		return 0, errors.New("token claims are not of type *tokenClaims")
+	}
+
+	return claims.UserId, nil
 }
 
 func GenerateSalt() (string, error) {

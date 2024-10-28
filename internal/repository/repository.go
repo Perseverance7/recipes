@@ -12,7 +12,7 @@ type Authorization interface{
 }
 
 type Recipe interface{
-
+	CreateRecipe(recipe recipes.Recipe, ingredients []recipes.Ingredient) (int, error) 
 }
 
 type Repository struct{
@@ -23,5 +23,6 @@ type Repository struct{
 func NewRepository(db *sqlx.DB) *Repository{
 	return &Repository{
 		Authorization: NewAuthPostgres(db),
+		Recipe: NewRecipesPostgres(db),
 	}
 }

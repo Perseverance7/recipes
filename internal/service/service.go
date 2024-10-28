@@ -8,10 +8,11 @@ import (
 type Authorization interface{
 	CreateUser(user recipes.User) (int, error)
 	GenerateToken(username, password string) (string, error)
+	ParseToken(accessToken string) (int, error) 
 }
 
 type Recipe interface{
-
+	CreateRecipe(recipe recipes.Recipe, ingredients []recipes.Ingredient) (int, error) 
 }
 
 type Service struct{
@@ -22,5 +23,6 @@ type Service struct{
 func NewService(repo *repository.Repository) *Service{
 	return &Service{
 		Authorization: NewAuthService(repo.Authorization),
+		Recipe: NewRecipesService(repo.Recipe),
 	}
 }

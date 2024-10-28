@@ -10,7 +10,8 @@ type Unit struct {
 type Ingredient struct {
 	ID     int `json:"id"`
 	Name   string `json:"name"`
-	UnitID int `json:"unit_id"` 
+	UnitID int `json:"unit_id"`
+	Quantity float32 `json:"quantity"` 
 }
 
 // Структура для таблицы Recipes
@@ -26,13 +27,6 @@ type RecipeIngredient struct {
 	RecipeID    int     `json:"recipe_id"`
 	IngredientID int     `json:"ingredient_id"`
 	Quantity    float64 `json:"quantity"` 
-}
-
-// Структура для таблицы UserIngredients (ингредиенты пользователя)
-type UserIngredient struct {
-	UserID      int     `json:"user_id"`      
-	IngredientID int     `json:"ingredient_id"` 
-	Quantity    float64 `json:"quantity"`     
 }
 
 // Структура для таблицы SavedRecipes (сохраненные рецепты пользователя)
