@@ -18,6 +18,8 @@ type Recipe interface{
 	SaveRecipeToProfile(userId, recipeId int) error
 	GetSavedRecipes(userId int) ([]string,error)
 	UpdateRecipe(userID, recipeID int, updatedRecipe recipes.FullRecipe) error
+	DeleteRecipe(userID, recipeID int) error 
+	GetRecipesByIngredients(ingredients []string) (*[]recipes.SimplifiedRecipe, error)
 }
 
 type Repository struct{

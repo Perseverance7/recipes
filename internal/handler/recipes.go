@@ -123,5 +123,43 @@ func (h *Handler) updateRecipe(c *gin.Context){
 }
 
 func (h *Handler) deleteRecipe(c *gin.Context){
-	
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+
+	recipeId, err := strconv.Atoi(c.Param("id"))
+	if err != nil{
+		newErrorResponce(c, http.StatusBadRequest, "invalid id param")
+		return
+	}
+
+	if err := h.services.Recipe.DeleteRecipe(userId, recipeId); err != nil{
+		newErrorResponce(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "recipe delete successful"})
+}
+
+func (h *Handler) getRecipesByingredients(c *gin.Context){
+	var input map[string]string
+	if err := c.BindJSON(&input); err != nil{
+		newErrorResponce(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ingredients, ok := input["ingredients"]
+	if !ok {
+		newErrorResponce(c, http.StatusBadRequest, "ingredient is required")
+		return
+	}
+
+	recipes, err := h.services.Recipe.GetRecipesByIngredients(ingredients); 
+	if err != nil{
+		newErrorResponce(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, recipes)
 }

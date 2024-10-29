@@ -1,11 +1,13 @@
 package repository
 
 import (
+	"github.com/Eagoker/recipes"
+	
 	"database/sql"
 	"fmt"
 
-	"github.com/Eagoker/recipes"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type RecipesPostgres struct{
@@ -14,6 +16,49 @@ type RecipesPostgres struct{
 
 func NewRecipesPostgres(db *sqlx.DB) *RecipesPostgres{
 	return &RecipesPostgres{db: db}
+}
+
+func (r *RecipesPostgres) GetRecipesByIngredients(ingredients []string) (*[]recipes.SimplifiedRecipe, error) {
+	var findedRecipes []recipes.SimplifiedRecipe
+	
+	query := `
+		SELECT r.id, r.name, r.user_id
+		FROM recipes AS r
+		JOIN recipe_ingredients AS ri ON r.id = ri.recipe_id
+		JOIN ingredients AS i ON ri.ingredient_id = i.id
+		GROUP BY r.id, r.name, r.user_id
+		HAVING COUNT(DISTINCT i.name) = $1
+		AND ARRAY_AGG(DISTINCT i.name)::text[] @> $2::text[];
+`
+
+	numIngredients := len(ingredients)
+
+	rows, err := r.db.Query(query, numIngredients, pq.Array(ingredients))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+
+	for rows.Next() {
+		var recipeId int
+		var recipeName string
+		var userId int
+
+		err := rows.Scan(&recipeId, &recipeName, &userId)
+		if err != nil {
+			return nil, err 
+		}
+
+		findedRecipes = append(findedRecipes, recipes.SimplifiedRecipe{
+			ID: recipeId, 
+			Name: recipeName,
+			UserID: userId,
+		})
+
+	}
+
+	return &findedRecipes, nil
 }
 
 func (r *RecipesPostgres) CreateRecipe(recipe recipes.Recipe, ingredients []recipes.Ingredient) (int, error) {
@@ -105,7 +150,7 @@ func (r *RecipesPostgres) GetAllRecipes() (*[]recipes.SimplifiedRecipe, error) {
 		}
 
 		simplifiedRecipes = append(simplifiedRecipes, recipes.SimplifiedRecipe{
-			Id: recipeId,
+			ID: recipeId,
 			Name:   recipeName,
 			UserID: userID,
 		})
@@ -289,6 +334,36 @@ func (r *RecipesPostgres) UpdateRecipe(userID, recipeID int, updatedRecipe recip
 
 	// Завершаем транзакцию
 	return tx.Commit()
+}
+
+func (r *RecipesPostgres) DeleteRecipe(userID, recipeID int) error {
+	var creatorID int
+	query := fmt.Sprintf("SELECT user_id FROM %s WHERE id = $1", recipesTable)
+	err := r.db.QueryRow(query, recipeID).Scan(&creatorID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("recipe not found")
+		}
+		return err
+	}
+
+	// Если текущий пользователь не создатель рецепта, возвращаем ошибку
+	if creatorID != userID {
+		return fmt.Errorf("user is not the owner of the recipe")
+	}
+
+	query = fmt.Sprintf(`
+		DELETE FROM %s
+		WHERE id = $1
+		`, recipesTable)
+	
+	_, err = r.db.Exec(query, recipeID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }
 
 

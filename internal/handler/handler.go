@@ -26,9 +26,10 @@ func (h *Handler) InitRoutes() *gin.Engine{
 	{
 		recipes := api.Group("/recipes")
 		{
-			recipes.POST("/", h.createRecipe)
-			recipes.GET("/", h.getAllRecipes)
+			recipes.POST("/create", h.createRecipe)
 			recipes.GET("/saved", h.getSavedRecipes)
+			recipes.GET("/by-ingredients", h.getRecipesByingredients)
+			recipes.GET("/", h.getAllRecipes)
 			recipes.POST("/:id", h.SaveRecipeToProfile)
 			recipes.GET("/:id", h.getRecipeById)
 			recipes.PUT("/:id", h.updateRecipe)
