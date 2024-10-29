@@ -41,3 +41,7 @@ func (s *RecipesService) SaveRecipeToProfile(userId, recipeId int) error {
 func (s *RecipesService) GetSavedRecipes(userId int) ([]string, error) {
 	return s.repo.GetSavedRecipes(userId)
 }
+
+func (s *RecipesService) UpdateRecipe(userID, recipeID int, updatedRecipe recipes.FullRecipe) error {
+	return s.repo.UpdateRecipe(userID, recipeID, updatedRecipe)
+}

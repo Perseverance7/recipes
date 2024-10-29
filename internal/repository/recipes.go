@@ -214,3 +214,81 @@ func (r *RecipesPostgres) GetSavedRecipes(userId int) ([]string,error) {
 	}
 	return recipes, nil
 }
+
+func (r *RecipesPostgres) UpdateRecipe(userID, recipeID int, updatedRecipe recipes.FullRecipe) error {
+	// Проверяем, является ли пользователь создателем рецепта
+	var creatorID int
+	query := fmt.Sprintf("SELECT user_id FROM %s WHERE id = $1", recipesTable)
+	err := r.db.QueryRow(query, recipeID).Scan(&creatorID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("recipe not found")
+		}
+		return err
+	}
+
+	// Если текущий пользователь не создатель рецепта, возвращаем ошибку
+	if creatorID != userID {
+		return fmt.Errorf("user is not the owner of the recipe")
+	}
+
+	// Начинаем транзакцию для атомарности операций
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	// Обновляем основную информацию о рецепте
+	query = fmt.Sprintf(`UPDATE %s
+						 SET name = $1, instructions = $2
+						 WHERE id = $3`, recipesTable)
+
+	_, err = tx.Exec(query, updatedRecipe.Recipe.Name, updatedRecipe.Recipe.Instructions, recipeID)
+	if err != nil {
+		return err
+	}
+
+	// Удаляем старые ингредиенты рецепта
+	query = fmt.Sprintf(`DELETE FROM %s
+						 WHERE recipe_id = $1`, recipesIngredientsTable)
+
+	_, err = tx.Exec(query, recipeID)
+	if err != nil {
+		return err
+	}
+
+	// Вставляем новые ингредиенты с проверкой на существование
+	for _, ingredient := range updatedRecipe.Ingredients {
+		var ingredientID int
+
+		// Проверяем, существует ли ингредиент
+		checkIngredientQuery := fmt.Sprintf("SELECT id FROM %s WHERE name = $1", ingredientsTable)
+		err = tx.QueryRow(checkIngredientQuery, ingredient.Name).Scan(&ingredientID)
+
+		if err == sql.ErrNoRows {
+			// Если ингредиент не существует, добавляем его
+			insertIngredientQuery := fmt.Sprintf("INSERT INTO %s (name, unit_id) VALUES ($1, $2) RETURNING id", ingredientsTable)
+			err = tx.QueryRow(insertIngredientQuery, ingredient.Name, ingredient.UnitID).Scan(&ingredientID)
+			if err != nil {
+				return err
+			}
+		} else if err != nil {
+			return err
+		}
+
+		// Добавляем ингредиент в recipe_ingredients
+		insertRecipeIngredientQuery := fmt.Sprintf(`
+			INSERT INTO %s (recipe_id, ingredient_id, quantity) 
+			VALUES ($1, $2, $3)`, recipesIngredientsTable)
+		_, err = tx.Exec(insertRecipeIngredientQuery, recipeID, ingredientID, ingredient.Quantity)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Завершаем транзакцию
+	return tx.Commit()
+}
+
+

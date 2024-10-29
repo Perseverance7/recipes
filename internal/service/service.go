@@ -17,6 +17,7 @@ type Recipe interface{
 	GetRecipeById(id int) (recipes.FullRecipe, error)
 	SaveRecipeToProfile(userId, recipeId int) error
 	GetSavedRecipes(userId int) ([]string,error)
+	UpdateRecipe(userID, recipeID int, updatedRecipe recipes.FullRecipe) error
 }
 
 type Service struct{

@@ -96,7 +96,30 @@ func (h *Handler) getSavedRecipes(c *gin.Context){
 }
 
 func (h *Handler) updateRecipe(c *gin.Context){
-	
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+
+	recipeId, err := strconv.Atoi(c.Param("id"))
+	if err != nil{
+		newErrorResponce(c, http.StatusBadRequest, "invalid id param")
+		return
+	}
+
+	var input recipes.FullRecipe
+	if err := c.BindJSON(&input); err != nil{
+		newErrorResponce(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := h.services.Recipe.UpdateRecipe(userId, recipeId, input); err != nil{
+		newErrorResponce(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "recipe updated succesfully"})
+
 }
 
 func (h *Handler) deleteRecipe(c *gin.Context){
