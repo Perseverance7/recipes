@@ -11,7 +11,7 @@ func (h *Handler) signUp(c *gin.Context){
 	var input recipes.User
 
 	if err := c.BindJSON(&input); err != nil{
-		newErrorResponce(c, http.StatusBadRequest, err.Error())
+		newErrorResponce(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
