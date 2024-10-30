@@ -29,7 +29,7 @@ func (r *RecipesPostgres) GetRecipesByIngredients(ingredients []string) (*[]reci
 		GROUP BY r.id, r.name, r.user_id
 		HAVING COUNT(DISTINCT i.name) = $1
 		AND ARRAY_AGG(DISTINCT i.name)::text[] @> $2::text[];
-`
+	`
 
 	numIngredients := len(ingredients)
 

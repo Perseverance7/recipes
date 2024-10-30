@@ -5,6 +5,8 @@ import (
 	"github.com/Eagoker/recipes/internal/repository"
 )
 
+//go:generate mockgen -source=service.go -destination=mocks/mock.go
+
 type Authorization interface{
 	CreateUser(user recipes.User) (int, error)
 	GenerateToken(username, password string) (string, error)
