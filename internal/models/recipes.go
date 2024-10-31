@@ -1,4 +1,4 @@
-package recipes
+package models
 
 // Структура для таблицы Units
 type Unit struct {

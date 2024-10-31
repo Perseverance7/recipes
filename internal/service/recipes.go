@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/Eagoker/recipes"
-	"github.com/Eagoker/recipes/internal/repository"
+	"github.com/Perceverance7/recipes/internal/models"
+	"github.com/Perceverance7/recipes/internal/repository"
 
 	"strings"
 	"regexp"
@@ -16,7 +16,7 @@ func NewRecipesService(repo repository.Recipe) *RecipesService{
 	return &RecipesService{repo: repo}
 }
 
-func (s *RecipesService) CreateRecipe(recipe recipes.Recipe, ingredients []recipes.Ingredient) (int, error) {
+func (s *RecipesService) CreateRecipe(recipe models.Recipe, ingredients []models.Ingredient) (int, error) {
 	recipe.Name = strings.ToLower(recipe.Name)
 	recipe.Instructions = strings.ToLower(recipe.Instructions)
 
@@ -27,11 +27,11 @@ func (s *RecipesService) CreateRecipe(recipe recipes.Recipe, ingredients []recip
 	return s.repo.CreateRecipe(recipe, ingredients)
 }
 
-func (s *RecipesService) GetAllRecipes() (*[]recipes.SimplifiedRecipe, error) {
+func (s *RecipesService) GetAllRecipes() (*[]models.SimplifiedRecipe, error) {
 	return s.repo.GetAllRecipes()
 }
 
-func (s *RecipesService) GetRecipeById(id int) (recipes.FullRecipe, error) {
+func (s *RecipesService) GetRecipeById(id int) (models.FullRecipe, error) {
 	return s.repo.GetRecipeById(id)
 }
 
@@ -43,7 +43,7 @@ func (s *RecipesService) GetSavedRecipes(userId int) ([]string, error) {
 	return s.repo.GetSavedRecipes(userId)
 }
 
-func (s *RecipesService) UpdateRecipe(userID, recipeID int, updatedRecipe recipes.FullRecipe) error {
+func (s *RecipesService) UpdateRecipe(userID, recipeID int, updatedRecipe models.FullRecipe) error {
 	return s.repo.UpdateRecipe(userID, recipeID, updatedRecipe)
 }
 
@@ -51,7 +51,7 @@ func (s *RecipesService) DeleteRecipe(userID, recipeID int) error {
 	return s.repo.DeleteRecipe(userID, recipeID)
 }
 
-func (s *RecipesService) GetRecipesByIngredients(ingredients string) (*[]recipes.SimplifiedRecipe, error) {
+func (s *RecipesService) GetRecipesByIngredients(ingredients string) (*[]models.SimplifiedRecipe, error) {
 	ingredientsArr := extractWords(ingredients)
 	return s.repo.GetRecipesByIngredients(ingredientsArr)
 

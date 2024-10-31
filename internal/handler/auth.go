@@ -3,12 +3,12 @@ package handler
 import (
 	"net/http"
 
-	"github.com/Eagoker/recipes"
+	"github.com/Perceverance7/recipes/internal/models"
 
 	"github.com/gin-gonic/gin"
 )
 func (h *Handler) signUp(c *gin.Context){
-	var input recipes.User
+	var input models.User
 
 	if err := c.BindJSON(&input); err != nil{
 		newErrorResponce(c, http.StatusBadRequest, "invalid input body")
@@ -17,7 +17,7 @@ func (h *Handler) signUp(c *gin.Context){
 
 	id, err := h.services.Authorization.CreateUser(input)
 	if err != nil{
-		newErrorResponce(c, http.StatusInternalServerError, err.Error())
+		newErrorResponce(c, http.StatusConflict, err.Error())
 		return
 	}
 

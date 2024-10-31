@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/Eagoker/recipes"
+	"github.com/Perceverance7/recipes/internal/models"
 	
 	"database/sql"
 	"fmt"
@@ -18,8 +18,8 @@ func NewRecipesPostgres(db *sqlx.DB) *RecipesPostgres{
 	return &RecipesPostgres{db: db}
 }
 
-func (r *RecipesPostgres) GetRecipesByIngredients(ingredients []string) (*[]recipes.SimplifiedRecipe, error) {
-	var findedRecipes []recipes.SimplifiedRecipe
+func (r *RecipesPostgres) GetRecipesByIngredients(ingredients []string) (*[]models.SimplifiedRecipe, error) {
+	var findedRecipes []models.SimplifiedRecipe
 	
 	query := `
 		SELECT r.id, r.name, r.user_id
@@ -50,7 +50,7 @@ func (r *RecipesPostgres) GetRecipesByIngredients(ingredients []string) (*[]reci
 			return nil, err 
 		}
 
-		findedRecipes = append(findedRecipes, recipes.SimplifiedRecipe{
+		findedRecipes = append(findedRecipes, models.SimplifiedRecipe{
 			ID: recipeId, 
 			Name: recipeName,
 			UserID: userId,
@@ -61,7 +61,7 @@ func (r *RecipesPostgres) GetRecipesByIngredients(ingredients []string) (*[]reci
 	return &findedRecipes, nil
 }
 
-func (r *RecipesPostgres) CreateRecipe(recipe recipes.Recipe, ingredients []recipes.Ingredient) (int, error) {
+func (r *RecipesPostgres) CreateRecipe(recipe models.Recipe, ingredients []models.Ingredient) (int, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return 0, err
@@ -122,8 +122,8 @@ func (r *RecipesPostgres) CreateRecipe(recipe recipes.Recipe, ingredients []reci
 	return recipeID, nil
 }
 
-func (r *RecipesPostgres) GetAllRecipes() (*[]recipes.SimplifiedRecipe, error) {
-	var simplifiedRecipes []recipes.SimplifiedRecipe
+func (r *RecipesPostgres) GetAllRecipes() (*[]models.SimplifiedRecipe, error) {
+	var simplifiedRecipes []models.SimplifiedRecipe
 
 	// Запрос на выборку всех рецептов с их именами и user ID
 	query := fmt.Sprintf(`
@@ -149,7 +149,7 @@ func (r *RecipesPostgres) GetAllRecipes() (*[]recipes.SimplifiedRecipe, error) {
 			return nil, err
 		}
 
-		simplifiedRecipes = append(simplifiedRecipes, recipes.SimplifiedRecipe{
+		simplifiedRecipes = append(simplifiedRecipes, models.SimplifiedRecipe{
 			ID: recipeId,
 			Name:   recipeName,
 			UserID: userID,
@@ -163,8 +163,8 @@ func (r *RecipesPostgres) GetAllRecipes() (*[]recipes.SimplifiedRecipe, error) {
 	return &simplifiedRecipes, nil
 }
 
-func (r *RecipesPostgres) GetRecipeById(id int) (recipes.FullRecipe, error) {
-	var recipe recipes.FullRecipe
+func (r *RecipesPostgres) GetRecipeById(id int) (models.FullRecipe, error) {
+	var recipe models.FullRecipe
 
 	// Запрос для получения рецепта и его ингредиентов
 	query := fmt.Sprintf(`
@@ -202,7 +202,7 @@ func (r *RecipesPostgres) GetRecipeById(id int) (recipes.FullRecipe, error) {
 		}
 
 		// Заполняем рецепт (без проверки на ID)
-		recipe.Recipe = recipes.Recipe{
+		recipe.Recipe = models.Recipe{
 			ID:          recipeID,
 			Name:        recipeName,
 			Instructions: recipeInstructions,
@@ -211,7 +211,7 @@ func (r *RecipesPostgres) GetRecipeById(id int) (recipes.FullRecipe, error) {
 
 		// Если есть ингредиент, добавляем его
 		if ingredientID.Valid {
-			ingredient := recipes.Ingredient{
+			ingredient := models.Ingredient{
 				ID:       int(ingredientID.Int64),
 				Name:     ingredientName.String,
 				UnitID:   int(unitID.Int64),
@@ -260,7 +260,7 @@ func (r *RecipesPostgres) GetSavedRecipes(userId int) ([]string,error) {
 	return recipes, nil
 }
 
-func (r *RecipesPostgres) UpdateRecipe(userID, recipeID int, updatedRecipe recipes.FullRecipe) error {
+func (r *RecipesPostgres) UpdateRecipe(userID, recipeID int, updatedRecipe models.FullRecipe) error {
 	// Проверяем, является ли пользователь создателем рецепта
 	var creatorID int
 	query := fmt.Sprintf("SELECT user_id FROM %s WHERE id = $1", recipesTable)

@@ -1,4 +1,4 @@
-module github.com/Eagoker/recipes
+module github.com/Perceverance7/recipes
 
 go 1.23
 

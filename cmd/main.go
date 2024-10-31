@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/Eagoker/recipes"
-	"github.com/Eagoker/recipes/internal/handler"
-	"github.com/Eagoker/recipes/internal/repository"
-	"github.com/Eagoker/recipes/internal/service"
+	"github.com/Perceverance7/recipes/internal/models"
+	"github.com/Perceverance7/recipes/internal/handler"
+	"github.com/Perceverance7/recipes/internal/repository"
+	"github.com/Perceverance7/recipes/internal/service"
 	
 	"os"
 
@@ -40,7 +40,7 @@ func main(){
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
-	srv := new(recipes.Server)
+	srv := new(models.Server)
 	srv.Run(viper.GetString("port"), handlers.InitRoutes())
 }
 

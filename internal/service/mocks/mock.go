@@ -7,7 +7,7 @@ package mock_service
 import (
 	reflect "reflect"
 
-	recipes "github.com/Eagoker/recipes"
+	models "github.com/Perceverance7/recipes/internal/models"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -35,7 +35,7 @@ func (m *MockAuthorization) EXPECT() *MockAuthorizationMockRecorder {
 }
 
 // CreateUser mocks base method.
-func (m *MockAuthorization) CreateUser(user recipes.User) (int, error) {
+func (m *MockAuthorization) CreateUser(user models.User) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", user)
 	ret0, _ := ret[0].(int)
@@ -103,7 +103,7 @@ func (m *MockRecipe) EXPECT() *MockRecipeMockRecorder {
 }
 
 // CreateRecipe mocks base method.
-func (m *MockRecipe) CreateRecipe(recipe recipes.Recipe, ingredients []recipes.Ingredient) (int, error) {
+func (m *MockRecipe) CreateRecipe(recipe models.Recipe, ingredients []models.Ingredient) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateRecipe", recipe, ingredients)
 	ret0, _ := ret[0].(int)
@@ -132,10 +132,10 @@ func (mr *MockRecipeMockRecorder) DeleteRecipe(userID, recipeID interface{}) *go
 }
 
 // GetAllRecipes mocks base method.
-func (m *MockRecipe) GetAllRecipes() (*[]recipes.SimplifiedRecipe, error) {
+func (m *MockRecipe) GetAllRecipes() (*[]models.SimplifiedRecipe, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAllRecipes")
-	ret0, _ := ret[0].(*[]recipes.SimplifiedRecipe)
+	ret0, _ := ret[0].(*[]models.SimplifiedRecipe)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -147,10 +147,10 @@ func (mr *MockRecipeMockRecorder) GetAllRecipes() *gomock.Call {
 }
 
 // GetRecipeById mocks base method.
-func (m *MockRecipe) GetRecipeById(id int) (recipes.FullRecipe, error) {
+func (m *MockRecipe) GetRecipeById(id int) (models.FullRecipe, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRecipeById", id)
-	ret0, _ := ret[0].(recipes.FullRecipe)
+	ret0, _ := ret[0].(models.FullRecipe)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -162,10 +162,10 @@ func (mr *MockRecipeMockRecorder) GetRecipeById(id interface{}) *gomock.Call {
 }
 
 // GetRecipesByIngredients mocks base method.
-func (m *MockRecipe) GetRecipesByIngredients(ingredients string) (*[]recipes.SimplifiedRecipe, error) {
+func (m *MockRecipe) GetRecipesByIngredients(ingredients string) (*[]models.SimplifiedRecipe, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRecipesByIngredients", ingredients)
-	ret0, _ := ret[0].(*[]recipes.SimplifiedRecipe)
+	ret0, _ := ret[0].(*[]models.SimplifiedRecipe)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -206,7 +206,7 @@ func (mr *MockRecipeMockRecorder) SaveRecipeToProfile(userId, recipeId interface
 }
 
 // UpdateRecipe mocks base method.
-func (m *MockRecipe) UpdateRecipe(userID, recipeID int, updatedRecipe recipes.FullRecipe) error {
+func (m *MockRecipe) UpdateRecipe(userID, recipeID int, updatedRecipe models.FullRecipe) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateRecipe", userID, recipeID, updatedRecipe)
 	ret0, _ := ret[0].(error)

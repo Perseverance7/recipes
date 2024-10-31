@@ -1,11 +1,12 @@
 package service
 
 import (
-	"github.com/Eagoker/recipes"
-	"github.com/Eagoker/recipes/internal/repository"
+	"github.com/Perceverance7/recipes/internal/models"
+	"github.com/Perceverance7/recipes/internal/repository"
 
 	"os"
 	"errors"
+	"strings"
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
@@ -35,7 +36,7 @@ func NewAuthService(repo repository.Authorization) *AuthService{
 	return &AuthService{repo: repo}
 }
 
-func (a *AuthService) CreateUser(user recipes.User) (int, error){
+func (a *AuthService) CreateUser(user models.User) (int, error){
 	var err error
 
 	user.Salt, err = GenerateSalt()
@@ -44,7 +45,14 @@ func (a *AuthService) CreateUser(user recipes.User) (int, error){
 	}
 
 	user.Password = HashPassword(user.Password, user.Salt)
-	return a.repo.CreateUser(user)
+	id, err := a.repo.CreateUser(user)
+	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint \"users_username_key\"") {
+			return 0, errors.New("user already exists")
+		}
+		return 0, errors.New(err.Error())
+	}
+	return id, nil
 }
 
 func (a *AuthService) GenerateToken(username, password string) (string, error) {

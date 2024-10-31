@@ -17,16 +17,16 @@ func Test_extractWords(t *testing.T) {
 		{
 			name: "One ingredient",
 			args: args{
-				input: "сыр",
+				input: "cheese",
 			},
-			want: []string{"сыр"},
+			want: []string{"cheese"},
 		},
 		{
 			name: "Two ingredient",
 			args: args{
-				input: "сыр, укроп",
+				input: "cheese, potato",
 			},
-			want: []string{"сыр", "укроп"},
+			want: []string{"cheese", "potato"},
 		},
 		{
 			name: "No ingredient",
@@ -38,16 +38,16 @@ func Test_extractWords(t *testing.T) {
 		{
 			name: "Long ingredient",
 			args: args{
-				input: "сыр пармезан",
+				input: "parmesan cheese",
 			},
-			want: []string{"сыр пармезан"},
+			want: []string{"parmesan cheese"},
 		},
 		{
 			name: "Upper case ingredients",
 			args: args{
-				input: "Паста, картофЕль , морКовЬ",
+				input: "pasTA, tomaTo , Broccoli",
 			},
-			want: []string{"паста", "картофель", "морковь"},
+			want: []string{"pasta", "tomato", "broccoli"},
 		},
 
 

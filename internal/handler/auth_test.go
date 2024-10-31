@@ -6,21 +6,21 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Eagoker/recipes"
-	"github.com/Eagoker/recipes/internal/service"
-	mock_service "github.com/Eagoker/recipes/internal/service/mocks"
+	"github.com/Perceverance7/recipes/internal/models"
+	"github.com/Perceverance7/recipes/internal/service"
+	mock_service "github.com/Perceverance7/recipes/internal/service/mocks"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHandler_signUp(t *testing.T) {
-	type mockBehaviour func(s *mock_service.MockAuthorization, user recipes.User)
+	type mockBehaviour func(s *mock_service.MockAuthorization, user models.User)
 
 	testTable := []struct {
 		name string
 		inputBody string
-		inputUser recipes.User
+		inputUser models.User
 		mockBehaviour mockBehaviour
 		expectedStatusCode int
 		expectedRequestBody string
@@ -28,11 +28,11 @@ func TestHandler_signUp(t *testing.T) {
 		{
 			name: "OK",
 			inputBody: `{"username": "Test", "password": "test"}`,
-			inputUser: recipes.User{
+			inputUser: models.User{
 				Username: "Test",
 				Password: "test",
 			},
-			mockBehaviour: func(s *mock_service.MockAuthorization, user recipes.User) {
+			mockBehaviour: func(s *mock_service.MockAuthorization, user models.User) {
 				s.EXPECT().CreateUser(user).Return(1, nil)
 			},
 			expectedStatusCode: 200,
@@ -42,7 +42,7 @@ func TestHandler_signUp(t *testing.T) {
 		{
 			name: "Empty fields",
 			inputBody: `{"password": "test"}`,
-			mockBehaviour: func(s *mock_service.MockAuthorization, user recipes.User) {},
+			mockBehaviour: func(s *mock_service.MockAuthorization, user models.User) {},
 			expectedStatusCode: 400,
 			expectedRequestBody: `{"message":"invalid input body"}`,
 
@@ -50,11 +50,11 @@ func TestHandler_signUp(t *testing.T) {
 		{
 			name: "Service failure",
 			inputBody: `{"username": "Test", "password": "test"}`,
-			inputUser: recipes.User{
+			inputUser: models.User{
 				Username: "Test",
 				Password: "test",
 			},
-			mockBehaviour: func(s *mock_service.MockAuthorization, user recipes.User) {
+			mockBehaviour: func(s *mock_service.MockAuthorization, user models.User) {
 				s.EXPECT().CreateUser(user).Return(1, errors.New("service failure"))
 			},
 			expectedStatusCode: 500,

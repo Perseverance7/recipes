@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/Eagoker/recipes"
+	"github.com/Perceverance7/recipes/internal/models"
 
 	"net/http"
 	"strconv"
@@ -15,7 +15,7 @@ func (h *Handler) createRecipe(c *gin.Context){
 		return
 	}
 
-	var input recipes.FullRecipe
+	var input models.FullRecipe
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponce(c, http.StatusInternalServerError, err.Error())
 		return
@@ -107,7 +107,7 @@ func (h *Handler) updateRecipe(c *gin.Context){
 		return
 	}
 
-	var input recipes.FullRecipe
+	var input models.FullRecipe
 	if err := c.BindJSON(&input); err != nil{
 		newErrorResponce(c, http.StatusBadRequest, err.Error())
 		return

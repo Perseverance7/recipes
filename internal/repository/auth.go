@@ -3,7 +3,7 @@ package repository
 import (
 	"fmt"
 
-	"github.com/Eagoker/recipes"
+	"github.com/Perceverance7/recipes/internal/models"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -15,7 +15,7 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres{
 	return &AuthPostgres{db: db}
 }
 
-func (a *AuthPostgres) CreateUser(user recipes.User) (int, error) {
+func (a *AuthPostgres) CreateUser(user models.User) (int, error) {
 	var id int
 	query := fmt.Sprintf("INSERT INTO %s (username, password_hash, salt) VALUES ($1, $2, $3) RETURNING id", usersTable)
 	row := a.db.QueryRow(query, user.Username, user.Password, user.Salt)
@@ -36,8 +36,8 @@ func(a *AuthPostgres) GetUserSalt(username string) (string, error){
 	return salt, nil
 }
 
-func (a *AuthPostgres) GetUser(username, password string) (recipes.User, error) {
-	var user recipes.User
+func (a *AuthPostgres) GetUser(username, password string) (models.User, error) {
+	var user models.User
 	query := fmt.Sprintf("SELECT id FROM %s WHERE username=$1 AND password_hash=$2", usersTable)
 	err := a.db.Get(&user, query, username, password)
 	

@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/Eagoker/recipes/internal/service"
+	"github.com/Perceverance7/recipes/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
