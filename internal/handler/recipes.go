@@ -17,7 +17,7 @@ func (h *Handler) createRecipe(c *gin.Context){
 
 	var input models.FullRecipe
 	if err := c.BindJSON(&input); err != nil {
-		newErrorResponce(c, http.StatusInternalServerError, err.Error())
+		newErrorResponce(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -75,6 +75,11 @@ func (h *Handler) getRecipeById(c *gin.Context){
 	recipe, err := h.services.Recipe.GetRecipeById(id)
 	if err != nil{
 		newErrorResponce(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	
+	if recipe == nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "recipe not found"})
 		return
 	}
 

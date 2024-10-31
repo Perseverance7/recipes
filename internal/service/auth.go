@@ -59,11 +59,11 @@ func (a *AuthService) GenerateToken(username, password string) (string, error) {
 	salt, err := a.repo.GetUserSalt(username)
 
 	if err != nil{
-		return "User does not exist", err
+		return "", errors.New("invalid login or password") 
 	} else {
 		user, err := a.repo.GetUser(username, HashPassword(password, salt))
 		if err != nil {
-			return "", err
+			return "", errors.New("invalid login or password")
 		}
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, &TokenClaims{

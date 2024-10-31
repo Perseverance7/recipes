@@ -16,7 +16,7 @@ type Recipe interface{
 	GetAllRecipes() (*[]models.SimplifiedRecipe, error)
 	GetRecipeById(id int) (models.FullRecipe, error)
 	SaveRecipeToProfile(userId, recipeId int) error
-	GetSavedRecipes(userId int) ([]string,error)
+	GetSavedRecipes(userId int) ([]models.SavedRecipes,error)
 	UpdateRecipe(userID, recipeID int, updatedRecipe models.FullRecipe) error
 	DeleteRecipe(userID, recipeID int) error 
 	GetRecipesByIngredients(ingredients []string) (*[]models.SimplifiedRecipe, error)

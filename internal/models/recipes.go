@@ -37,6 +37,12 @@ type SavedRecipe struct {
 
 // --------------------------
 
+
+type SavedRecipes struct {
+	ID     int    `json:"id"`
+	Name   string `json:"name"`
+}
+
 type SimplifiedRecipe struct {
 	ID     int    `json:"id"`
 	Name   string `json:"name"`

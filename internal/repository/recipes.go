@@ -5,6 +5,7 @@ import (
 	
 	"database/sql"
 	"fmt"
+	"errors"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -78,31 +79,44 @@ func (r *RecipesPostgres) CreateRecipe(recipe models.Recipe, ingredients []model
 		}
 	}()
 
-	// 1. Добавляем новый рецепт в таблицу recipes
+	// 1. Проверяем, существует ли рецепт с таким названием
+	var existingRecipeID int
+	query := fmt.Sprintf("SELECT id FROM %s WHERE name = $1 AND user_id = $2", recipesTable)
+	err = tx.QueryRow(query, recipe.Name, recipe.UserID).Scan(&existingRecipeID)
+
+	if err == nil {
+		// Рецепт уже существует, возвращаем ошибку
+		return 0, errors.New("рецепт уже существует")
+	} else if err != sql.ErrNoRows {
+		// Возвращаем ошибку в случае других проблем с запросом
+		return 0, err
+	}
+
+	// 2. Добавляем новый рецепт в таблицу recipes
 	var recipeID int
-	query := fmt.Sprintf("INSERT INTO %s (name, instructions, user_id) VALUES ($1, $2, $3) RETURNING id", recipesTable)
+	query = fmt.Sprintf("INSERT INTO %s (name, instructions, user_id) VALUES ($1, $2, $3) RETURNING id", recipesTable)
 	err = tx.QueryRow(query, recipe.Name, recipe.Instructions, recipe.UserID).Scan(&recipeID)
 	if err != nil {
 		return 0, err
 	}
 
-	// 2. Проверяем ингредиенты и добавляем их, если они отсутствуют
+	// 3. Проверяем ингредиенты и добавляем их, если они отсутствуют
 	for _, ingredient := range ingredients {
 		var ingredientID int
 
-		// Проверяем, существует ли 
-		query := fmt.Sprintf("SELECT id FROM %s WHERE name = $1", ingredientsTable)
-		err = tx.QueryRow(query,ingredient.Name).Scan(&ingredientID)
+		// Проверяем, существует ли ингредиент
+		query = fmt.Sprintf("SELECT id FROM %s WHERE name = $1", ingredientsTable)
+		err = tx.QueryRow(query, ingredient.Name).Scan(&ingredientID)
 
 		if err == sql.ErrNoRows {
 			// Если ингредиент не существует, добавляем его
-			query := fmt.Sprintf("INSERT INTO %s (name, unit_id) VALUES ($1, $2) RETURNING id", ingredientsTable)
+			query = fmt.Sprintf("INSERT INTO %s (name, unit_id) VALUES ($1, $2) RETURNING id", ingredientsTable)
 			err = tx.QueryRow(query, ingredient.Name, ingredient.UnitID).Scan(&ingredientID)
 
 			if err != nil {
 				return 0, err
 			}
-
+			
 		} else if err != nil {
 			return 0, err
 		}
@@ -243,19 +257,19 @@ func (r *RecipesPostgres) SaveRecipeToProfile(userId, recipeId int) error {
 	return err
 }
 
-func (r *RecipesPostgres) GetSavedRecipes(userId int) ([]string,error) {
+func (r *RecipesPostgres) GetSavedRecipes(userId int) ([]models.SavedRecipes,error) {
 	query := fmt.Sprintf(`
-		SELECT r.name
+		SELECT r.id, r.name
 		FROM %s AS r
 		JOIN %s AS sr ON sr.recipe_id = r.id
 		WHERE sr.user_id = $1
 
 	`, recipesTable, savedRecipesTable)
 
-	var recipes []string
+	var recipes []models.SavedRecipes
 	err := r.db.Select(&recipes, query, userId)
 	if err != nil{
-		return []string{""}, err
+		return []models.SavedRecipes{}, err
 	}
 	return recipes, nil
 }
