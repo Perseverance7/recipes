@@ -2,7 +2,11 @@ package handler
 
 import (
 	"github.com/Perceverance7/recipes/internal/service"
+	"github.com/Perceverance7/recipes/docs"
+	
 	"github.com/gin-gonic/gin"
+	"github.com/swaggo/gin-swagger"           
+	swaggerFiles "github.com/swaggo/files"
 )
 
 type Handler struct{
@@ -15,6 +19,9 @@ func NewHandler(services *service.Service) *Handler{
 
 func (h *Handler) InitRoutes() *gin.Engine{
 	router := gin.New()
+
+	docs.SwaggerInfo.BasePath = "/api"
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	auth := router.Group("/auth")
 	{
