@@ -1,10 +1,27 @@
 definitions:
+  handler.IngredientsInput:
+    properties:
+      ingredients:
+        type: string
+    required:
+    - ingredients
+    type: object
   handler.errorResponse:
     properties:
       message:
         type: string
     type: object
   handler.signInInput:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  handler.signUpInput:
     properties:
       password:
         type: string
@@ -38,6 +55,38 @@ definitions:
     - quantity
     - unit_id
     type: object
+  models.InputFullRecipe:
+    properties:
+      ingredients:
+        items:
+          $ref: '#/definitions/models.InputIngredient'
+        type: array
+      recipe:
+        $ref: '#/definitions/models.InputRecipe'
+    type: object
+  models.InputIngredient:
+    properties:
+      name:
+        type: string
+      quantity:
+        type: number
+      unit_id:
+        type: integer
+    required:
+    - name
+    - quantity
+    - unit_id
+    type: object
+  models.InputRecipe:
+    properties:
+      instructions:
+        type: string
+      name:
+        type: string
+    required:
+    - instructions
+    - name
+    type: object
   models.Recipe:
     properties:
       id:
@@ -67,20 +116,6 @@ definitions:
         type: string
       user_id:
         type: integer
-    type: object
-  models.User:
-    properties:
-      id:
-        type: integer
-      password:
-        type: string
-      salt:
-        type: string
-      username:
-        type: string
-    required:
-    - password
-    - username
     type: object
 host: localhost:8081
 info:
@@ -166,6 +201,12 @@ paths:
       consumes:
       - application/json
       description: getting recipe by id
+      parameters:
+      - description: ID рецепта
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -242,6 +283,12 @@ paths:
         name: id
         required: true
         type: integer
+      - description: New data for recipe
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.InputFullRecipe'
       produces:
       - application/json
       responses:
@@ -281,9 +328,7 @@ paths:
         name: input
         required: true
         schema:
-          additionalProperties:
-            type: string
-          type: object
+          $ref: '#/definitions/handler.IngredientsInput'
       produces:
       - application/json
       responses:
@@ -325,7 +370,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/models.FullRecipe'
+          $ref: '#/definitions/models.InputFullRecipe'
       produces:
       - application/json
       responses:
@@ -438,7 +483,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/handler.signUpInput'
       produces:
       - application/json
       responses:
@@ -466,7 +511,7 @@ paths:
       tags:
       - auth
 securityDefinitions:
-  ApiKEyAuth:
+  BearerAuth:
     in: header
     name: Authorization
     type: apiKey

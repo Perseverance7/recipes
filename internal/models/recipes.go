@@ -53,3 +53,21 @@ type FullRecipe struct {
 	Recipe        Recipe            `json:"recipe"`
 	Ingredients  []Ingredient      `json:"ingredients"`
 }
+
+// ---------------------------
+
+type InputRecipe struct {
+	Name        string `json:"name" binding:"required"`
+	Instructions string `json:"instructions" binding:"required"` 
+}
+
+type InputIngredient struct {
+	Name   string `json:"name" binding:"required"`
+	UnitID int `json:"unit_id" binding:"required"`
+	Quantity float32 `json:"quantity" binding:"required"` 
+}
+
+type InputFullRecipe struct {
+	Recipe InputRecipe
+	Ingredients []InputIngredient
+}

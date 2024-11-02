@@ -20,7 +20,7 @@ func NewHandler(services *service.Service) *Handler{
 func (h *Handler) InitRoutes() *gin.Engine{
 	router := gin.New()
 
-	docs.SwaggerInfo.BasePath = "/api"
+	docs.SwaggerInfo.BasePath = "/"
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	auth := router.Group("/auth")
@@ -35,7 +35,7 @@ func (h *Handler) InitRoutes() *gin.Engine{
 		{
 			recipes.POST("/create", h.createRecipe)
 			recipes.GET("/saved", h.getSavedRecipes)
-			recipes.POST("/by-ingredients", h.getRecipesByingredients)
+			recipes.POST("/by-ingredients", h.getRecipesByIngredients)
 			recipes.GET("/", h.getAllRecipes)
 			recipes.POST("/:id", h.SaveRecipeToProfile)
 			recipes.GET("/:id", h.getRecipeById)

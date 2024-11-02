@@ -95,10 +95,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/handler.IngredientsInput"
                         }
                     }
                 ],
@@ -164,7 +161,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.FullRecipe"
+                            "$ref": "#/definitions/models.InputFullRecipe"
                         }
                     }
                 ],
@@ -275,6 +272,15 @@ const docTemplate = `{
                     "api/recipes"
                 ],
                 "summary": "getRecipeById",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID рецепта",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -332,6 +338,15 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "New data for recipe",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.InputFullRecipe"
+                        }
                     }
                 ],
                 "responses": {
@@ -564,7 +579,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/handler.signUpInput"
                         }
                     }
                 ],
@@ -604,6 +619,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "handler.IngredientsInput": {
+            "type": "object",
+            "required": [
+                "ingredients"
+            ],
+            "properties": {
+                "ingredients": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.errorResponse": {
             "type": "object",
             "properties": {
@@ -613,6 +639,21 @@ const docTemplate = `{
             }
         },
         "handler.signInInput": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.signUpInput": {
             "type": "object",
             "required": [
                 "password",
@@ -663,6 +704,54 @@ const docTemplate = `{
                 }
             }
         },
+        "models.InputFullRecipe": {
+            "type": "object",
+            "properties": {
+                "ingredients": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.InputIngredient"
+                    }
+                },
+                "recipe": {
+                    "$ref": "#/definitions/models.InputRecipe"
+                }
+            }
+        },
+        "models.InputIngredient": {
+            "type": "object",
+            "required": [
+                "name",
+                "quantity",
+                "unit_id"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "number"
+                },
+                "unit_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.InputRecipe": {
+            "type": "object",
+            "required": [
+                "instructions",
+                "name"
+            ],
+            "properties": {
+                "instructions": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Recipe": {
             "type": "object",
             "required": [
@@ -708,31 +797,10 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
-        },
-        "models.User": {
-            "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "salt": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
         }
     },
     "securityDefinitions": {
-        "ApiKEyAuth": {
+        "BearerAuth": {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

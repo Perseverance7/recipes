@@ -20,7 +20,7 @@ import (
 // @host localhost:8081
 // @BasePath: /
 
-// @securityDefinitions.apikey ApiKEyAuth
+// @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
 

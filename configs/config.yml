@@ -1,7 +1,7 @@
 port: "8081"
 db:
-  host: "localhost"
-  port: "5433"
+  host: "db"
+  port: "5432"
   user: "anton"
   dbname: "recipes_db"
   sslmode: "disable"
