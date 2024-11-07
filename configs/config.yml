@@ -1,4 +1,4 @@
-port: "8081"
+port: "8080"
 db:
   host: "db"
   port: "5432"

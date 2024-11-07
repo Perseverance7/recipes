@@ -1,11 +1,15 @@
 package main
 
 import (
-	"github.com/Perceverance7/recipes/internal/models"
+	"context"
+	"os/signal"
+	"syscall"
+
 	"github.com/Perceverance7/recipes/internal/handler"
+	"github.com/Perceverance7/recipes/internal/models"
 	"github.com/Perceverance7/recipes/internal/repository"
 	"github.com/Perceverance7/recipes/internal/service"
-	
+
 	"os"
 
 	"github.com/joho/godotenv"
@@ -52,7 +56,28 @@ func main(){
 	handlers := handler.NewHandler(services)
 
 	srv := new(models.Server)
-	srv.Run(viper.GetString("port"), handlers.InitRoutes())
+	go func(){
+		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil{
+			logrus.Fatalf("error running http server: %s", err.Error())
+		}
+	}()
+	
+	logrus.Print("Recipes started")
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	<-quit
+
+	logrus.Print("Recipes shutting down")
+
+	if err := srv.Shutdown(context.Background()); err != nil{
+		logrus.Errorf("error occured on server shutting down: %s", err.Error())
+	}
+
+	if err := db.Close(); err != nil{
+		logrus.Errorf("error occured on db connection close: %s", err.Error())
+	}
+
 }
 
 func InitConfig() error {
