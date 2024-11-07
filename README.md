@@ -17,3 +17,12 @@ Recipe Finder — это приложение, которое помогает �
 - **Database**: PostgreSQL
 
 
+## Запуск
+# 1
+git clone https://github.com/Perseverance7/recipes.git
+
+# 2
+docker-compose up --build
+
+# 3
+Swagger Api: http://localhost:8081/swagger/index.html#/api/recipes
