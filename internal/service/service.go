@@ -20,6 +20,7 @@ type Recipe interface{
 	UpdateRecipe(userID, recipeID int, updatedRecipe models.FullRecipe) error
 	DeleteRecipe(userID, recipeID int) error 
 	GetRecipesByIngredients(ingredients string) (*[]models.SimplifiedRecipe, error)
+	DeleteSavedRecipes(userId int,input []int) error
 }
 
 type Service struct{

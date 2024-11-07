@@ -400,6 +400,47 @@ paths:
       tags:
       - api/recipes
   /api/recipes/saved:
+    delete:
+      consumes:
+      - application/json
+      description: deleting saved recipes by ids
+      parameters:
+      - description: ID рецептов
+        in: body
+        name: input
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: deleteRecipesByIngredients
+      tags:
+      - api/recipes
     get:
       consumes:
       - application/json

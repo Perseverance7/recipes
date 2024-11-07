@@ -3,10 +3,11 @@ package service
 import (
 	"github.com/Perceverance7/recipes/internal/models"
 	"github.com/Perceverance7/recipes/internal/repository"
+	"github.com/sirupsen/logrus"
 
-	"strings"
 	"errors"
 	"regexp"
+	"strings"
 )
 
 type RecipesService struct{
@@ -82,6 +83,19 @@ func (s *RecipesService) GetRecipesByIngredients(ingredients string) (*[]models.
 	ingredientsArr := extractWords(ingredients)
 	return s.repo.GetRecipesByIngredients(ingredientsArr)
 
+}
+
+func (s *RecipesService) DeleteSavedRecipes(userId int, input []int) error {
+
+	go func(){
+		err := s.repo.DeleteSavedRecipes(userId, input)
+		if err != nil {
+			// Логируем ошибку, но не останавливаем основной поток
+			logrus.Printf("Error deleting saved recipes: %v", err)
+		}
+	}()
+
+	return nil
 }
 
 func extractWords(input string) []string {

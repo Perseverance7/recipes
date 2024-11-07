@@ -35,6 +35,7 @@ func (h *Handler) InitRoutes() *gin.Engine{
 		{
 			recipes.POST("/create", h.createRecipe)
 			recipes.GET("/saved", h.getSavedRecipes)
+			recipes.DELETE("/saved", h.deleteSavedRecipes)
 			recipes.POST("/by-ingredients", h.getRecipesByIngredients)
 			recipes.GET("/", h.getAllRecipes)
 			recipes.POST("/:id", h.SaveRecipeToProfile)

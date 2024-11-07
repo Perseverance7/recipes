@@ -377,7 +377,16 @@ func (r *RecipesPostgres) DeleteRecipe(userID, recipeID int) error {
 	}
 
 	return nil
+}
 
+func (r *RecipesPostgres) DeleteSavedRecipes(userId int, input []int) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE user_id = $1 AND recipe_id = ANY($2)", savedRecipesTable)
+	_, err := r.db.Exec(query, userId, pq.Array(input))
+	if err != nil{
+		return err
+	}
+
+	return nil
 }
 
 

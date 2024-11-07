@@ -261,3 +261,36 @@ func (h *Handler) getRecipesByIngredients(c *gin.Context) {
 
     c.JSON(http.StatusOK, recipes)
 }
+
+// @Summary deleteRecipesByIngredients
+// @Description deleting saved recipes by ids
+// @Security BearerAuth
+// @Tags api/recipes
+// @Accept json
+// @Produce json
+// @Param input body []int true "ID рецептов"
+// @Success 202 {object} string
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/recipes/saved [delete]
+func (h *Handler) deleteSavedRecipes(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+
+	var input []int
+
+	if err := c.BindJSON(&input); err != nil{
+		newErrorResponce(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := h.services.Recipe.DeleteSavedRecipes(userId, input); err != nil{
+		newErrorResponce(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusAccepted, gin.H{"message": "saved recipes deleting..."})
+}
