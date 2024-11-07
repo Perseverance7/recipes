@@ -1,23 +1,22 @@
 # Recipe Finder App
 
-## Описание
+## Description
 
-Recipe Finder — это приложение, которое помогает находить рецепты на основе введенных ингредиентов. Пользователи могут искать рецепты по ингредиентам, добавлять собственные рецепты, сохранять понравившиеся, а также редактировать и удалять созданные ими рецепты.
+Recipe Finder is an application that helps find recipes based on provided ingredients. Users can search for recipes by ingredients, add their own recipes, save favorites, and also edit or delete recipes they have created.
 
-## Основные функции
+## Key Features
 
-- **Поиск рецептов по ингредиентам**: находите рецепты, которые можно приготовить из имеющихся продуктов.
-- **Создание рецептов**: добавляйте свои рецепты с указанием ингредиентов и инструкций.
-- **Сохранение рецептов**: добавляйте рецепты в избранное для быстрого доступа.
-- **Редактирование и удаление**: управляйте своими рецептами — обновляйте их или удаляйте, если они больше не нужны.
+- **Recipe Search by Ingredients**: Find recipes that can be made with available ingredients.
+- **Recipe Creation**: Add your own recipes with ingredients and instructions.
+- **Save Recipes**: Add recipes to favorites for quick access.
+- **Edit and Delete**: Manage your recipes—update them or delete if they are no longer needed.
 
-## Стек технологий
+## Tech Stack
 
 - **Backend**: Go (Gin)
 - **Database**: PostgreSQL
 
-
-## Запуск
+## Launch
 # 1
 git clone https://github.com/Perseverance7/recipes.git
 
@@ -25,4 +24,10 @@ git clone https://github.com/Perseverance7/recipes.git
 docker-compose up --build
 
 # 3
-Swagger Api: http://localhost:8081/swagger/index.html#/api/recipes
+if app run{
+    Swagger Api: http://localhost:8081/swagger/index.html
+} 
+else {
+    docs/swagger.yaml
+}
+
