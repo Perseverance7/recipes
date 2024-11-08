@@ -1,7 +1,6 @@
--- Создание таблицы user_ingredients
-CREATE TABLE user_ingredients (
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    ingredient_id INT REFERENCES ingredients(id) ON DELETE CASCADE,
-    quantity DECIMAL(10, 2) NOT NULL,
-    PRIMARY KEY (user_id, ingredient_id)
-);
+DROP TABLE IF EXISTS saved_recipes;
+DROP TABLE IF EXISTS recipe_ingredients;
+DROP TABLE IF EXISTS recipes;
+DROP TABLE IF EXISTS ingredients;
+DROP TABLE IF EXISTS units;
+DROP TABLE IF EXISTS users;

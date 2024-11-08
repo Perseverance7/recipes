@@ -31,13 +31,6 @@ CREATE TABLE recipe_ingredients (
     PRIMARY KEY (recipe_id, ingredient_id)
 );
 
-CREATE TABLE user_ingredients (
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    ingredient_id INT REFERENCES ingredients(id) ON DELETE CASCADE,
-    quantity DECIMAL(10, 2) NOT NULL,
-    PRIMARY KEY (user_id, ingredient_id)
-);
-
 CREATE TABLE saved_recipes (
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
     recipe_id INT REFERENCES recipes(id) ON DELETE CASCADE,

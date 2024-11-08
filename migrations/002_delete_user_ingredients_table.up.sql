@@ -1,6 +1,3 @@
--- Удаление таблицы user_ingredients
-DROP TABLE IF EXISTS user_ingredients;
-
 -- Создание таблиц без user_ingredients
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
