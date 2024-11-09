@@ -15,6 +15,7 @@ Recipe Finder is an application that helps find recipes based on provided ingred
 
 - **Backend**: Go (Gin)
 - **Database**: PostgreSQL
+- **Cache**: Redis
 
 ## Launch
 # 1

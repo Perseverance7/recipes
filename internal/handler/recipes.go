@@ -57,7 +57,7 @@ func (h *Handler) createRecipe(c *gin.Context){
 // @Failure default {object} errorResponse
 // @Router /api/recipes [get]
 func (h *Handler) getAllRecipes(c *gin.Context){
-	fullRecipes, err := h.services.Recipe.GetAllRecipes()
+	fullRecipes, err := h.services.Recipe.GetAllRecipes(c.Request.Context())
 	if err != nil {
 		newErrorResponce(c, http.StatusInternalServerError, "Не удалось получить рецепты")
 		return

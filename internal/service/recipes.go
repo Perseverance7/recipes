@@ -1,8 +1,13 @@
 package service
 
 import (
+	"context"
+	"encoding/json"
+	"time"
+
 	"github.com/Perceverance7/recipes/internal/models"
 	"github.com/Perceverance7/recipes/internal/repository"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 
 	"errors"
@@ -12,10 +17,11 @@ import (
 
 type RecipesService struct{
 	repo repository.Recipe
+	rdb *redis.Client
 }
 
-func NewRecipesService(repo repository.Recipe) *RecipesService{
-	return &RecipesService{repo: repo}
+func NewRecipesService(repo repository.Recipe, rdb *redis.Client) *RecipesService{
+	return &RecipesService{repo: repo, rdb: rdb}
 }
 
 func (s *RecipesService) CreateRecipe(recipe models.Recipe, ingredients []models.Ingredient) (int, error) {
@@ -42,8 +48,32 @@ func (s *RecipesService) CreateRecipe(recipe models.Recipe, ingredients []models
 }
 
 
-func (s *RecipesService) GetAllRecipes() (*[]models.SimplifiedRecipe, error) {
-	return s.repo.GetAllRecipes()
+func (s *RecipesService) GetAllRecipes(ctx context.Context) (*[]models.SimplifiedRecipe, error) {
+	cacheKey := "all_recipes"
+
+	// Проверяем наличие данных в кэше
+	cachedData, err := s.rdb.Get(ctx, cacheKey).Result()
+	if err == nil {
+		var recipes []models.SimplifiedRecipe
+		err = json.Unmarshal([]byte(cachedData), &recipes)
+		if err == nil {
+			return &recipes, nil
+		}
+	}
+
+	// Данные не найдены в кэше - получаем из базы данных
+	recipes, err := s.repo.GetAllRecipes()
+	if err != nil {
+		return nil, err
+	}
+
+	// Сохраняем данные в кэше
+	recipesJSON, err := json.Marshal(recipes)
+	if err == nil {
+		s.rdb.Set(ctx, cacheKey, recipesJSON, 10*time.Second)
+	}
+
+	return recipes, nil
 }
 
 func (s *RecipesService) GetRecipeById(id int) (*models.FullRecipe, error) {

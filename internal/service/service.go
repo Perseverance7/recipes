@@ -1,8 +1,11 @@
 package service
 
 import (
+	"context"
+
 	"github.com/Perceverance7/recipes/internal/models"
 	"github.com/Perceverance7/recipes/internal/repository"
+	"github.com/redis/go-redis/v9"
 )
 
 type Authorization interface{
@@ -13,7 +16,7 @@ type Authorization interface{
 
 type Recipe interface{
 	CreateRecipe(recipe models.Recipe, ingredients []models.Ingredient) (int, error)
-	GetAllRecipes() (*[]models.SimplifiedRecipe, error)
+	GetAllRecipes(context.Context) (*[]models.SimplifiedRecipe, error)
 	GetRecipeById(id int) (*models.FullRecipe, error)
 	SaveRecipeToProfile(userId, recipeId int) error
 	GetSavedRecipes(userId int) ([]models.SavedRecipes,error)
@@ -28,9 +31,9 @@ type Service struct{
 	Recipe
 }
 
-func NewService(repo *repository.Repository) *Service{
+func NewService(repo *repository.Repository, rdb *redis.Client) *Service{
 	return &Service{
 		Authorization: NewAuthService(repo.Authorization),
-		Recipe: NewRecipesService(repo.Recipe),
+		Recipe: NewRecipesService(repo.Recipe, rdb),
 	}
 }

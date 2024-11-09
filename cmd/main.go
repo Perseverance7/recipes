@@ -1,20 +1,22 @@
 package main
 
-import (
-	"context"
-	"os/signal"
-	"syscall"
-
+import (	
 	"github.com/Perceverance7/recipes/internal/handler"
 	"github.com/Perceverance7/recipes/internal/models"
 	"github.com/Perceverance7/recipes/internal/repository"
 	"github.com/Perceverance7/recipes/internal/service"
-
+	
 	"os"
+	"context"
+	"os/signal"
+	"syscall"
+	"time"
+	"net/http"
 
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"github.com/redis/go-redis/v9"
 )
 
 // @title Recipes App API
@@ -39,6 +41,17 @@ func main(){
 		logrus.Fatalf("error with loading env variables: %s", err.Error())
 	}
 
+	rdb := redis.NewClient(&redis.Options{
+		Addr: "redis:6379", // Используйте имя сервиса Redis из docker-compose
+	})
+
+	_, err := rdb.Ping(context.Background()).Result()
+	if err != nil {
+		logrus.Fatalf("Ошибка подключения к Redis: %v", err)
+	}
+
+	logrus.Println("Подключение к Redis установлено")
+
 	db, err := repository.NewPostgresDb(&repository.Config{
 		Host: viper.GetString("db.host"),
 		Port: viper.GetString("db.port"),
@@ -52,31 +65,40 @@ func main(){
 	}
 
 	repos := repository.NewRepository(db)
-	services := service.NewService(repos)
+	services := service.NewService(repos, rdb)
 	handlers := handler.NewHandler(services)
 
 	srv := new(models.Server)
-	go func(){
-		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil{
-			logrus.Fatalf("error running http server: %s", err.Error())
-		}
-	}()
 	
-	logrus.Print("Recipes started")
+	go func() {
+        if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil && err != http.ErrServerClosed {
+            logrus.Fatalf("error running HTTP server: %s", err.Error())
+        }
+    }()
 
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
-	<-quit
+    logrus.Print("Recipes started")
 
-	logrus.Print("Recipes shutting down")
+    // Канал для получения сигналов
+    quit := make(chan os.Signal, 1)
+    signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+    <-quit
 
-	if err := srv.Shutdown(context.Background()); err != nil{
-		logrus.Errorf("error occured on server shutting down: %s", err.Error())
-	}
+    logrus.Print("Recipes shutting down")
 
-	if err := db.Close(); err != nil{
-		logrus.Errorf("error occured on db connection close: %s", err.Error())
-	}
+    // Контекст с тайм-аутом для graceful shutdown
+    ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+    defer cancel()
+
+    if err := srv.Shutdown(ctx); err != nil {
+        logrus.Errorf("error occurred on server shutting down: %s", err.Error())
+    }
+
+    // Закрытие подключения к базе данных
+    if err := db.Close(); err != nil {
+        logrus.Errorf("error occurred on DB connection close: %s", err.Error())
+    }
+
+    logrus.Print("Shutdown complete")
 
 }
 
