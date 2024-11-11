@@ -4,22 +4,22 @@ import (
 	"github.com/Perceverance7/recipes/internal/models"
 	"github.com/Perceverance7/recipes/internal/repository"
 
-	"os"
-	"errors"
-	"strings"
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
+	"errors"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
-const(
+const (
 	tokenTTL = 12 * time.Hour
 )
 
-var(
+var (
 	signingKey = os.Getenv("SIGNING_KEY")
 )
 
@@ -28,19 +28,19 @@ type TokenClaims struct {
 	UserId int `json:"user_id"`
 }
 
-type AuthService struct{
+type AuthService struct {
 	repo repository.Authorization
 }
 
-func NewAuthService(repo repository.Authorization) *AuthService{
+func NewAuthService(repo repository.Authorization) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (a *AuthService) CreateUser(user models.User) (int, error){
+func (a *AuthService) CreateUser(user models.User) (int, error) {
 	var err error
 
 	user.Salt, err = GenerateSalt()
-	if err != nil{
+	if err != nil {
 		return 0, err
 	}
 
@@ -58,8 +58,8 @@ func (a *AuthService) CreateUser(user models.User) (int, error){
 func (a *AuthService) GenerateToken(username, password string) (string, error) {
 	salt, err := a.repo.GetUserSalt(username)
 
-	if err != nil{
-		return "", errors.New("invalid login or password") 
+	if err != nil {
+		return "", errors.New("invalid login or password")
 	} else {
 		user, err := a.repo.GetUser(username, HashPassword(password, salt))
 		if err != nil {
@@ -69,18 +69,18 @@ func (a *AuthService) GenerateToken(username, password string) (string, error) {
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, &TokenClaims{
 			jwt.StandardClaims{
 				ExpiresAt: time.Now().Add(tokenTTL).Unix(),
-				IssuedAt: time.Now().Unix(),
+				IssuedAt:  time.Now().Unix(),
 			},
 			user.Id,
 		})
-		
+
 		return token.SignedString([]byte(signingKey))
 	}
-	
+
 }
 
-func(a *AuthService) ParseToken(accessToken string) (int, error) {
-	token, err := jwt.ParseWithClaims(accessToken, &TokenClaims{}, func(token *jwt.Token) (interface{}, error){
+func (a *AuthService) ParseToken(accessToken string) (int, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
 		}
@@ -115,5 +115,3 @@ func HashPassword(password, salt string) string {
 	hasher.Write([]byte(password + salt))
 	return base64.StdEncoding.EncodeToString(hasher.Sum(nil))
 }
-
-

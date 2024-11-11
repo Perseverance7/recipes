@@ -1,27 +1,26 @@
 package repository
 
 import (
-	"github.com/Perceverance7/recipes/internal/models"
-	
 	"database/sql"
-	"fmt"
 	"errors"
+	"fmt"
 
+	"github.com/Perceverance7/recipes/internal/models"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 )
 
-type RecipesPostgres struct{
+type RecipesPostgres struct {
 	db *sqlx.DB
 }
 
-func NewRecipesPostgres(db *sqlx.DB) *RecipesPostgres{
+func NewRecipesPostgres(db *sqlx.DB) *RecipesPostgres {
 	return &RecipesPostgres{db: db}
 }
 
 func (r *RecipesPostgres) GetRecipesByIngredients(ingredients []string) (*[]models.SimplifiedRecipe, error) {
 	var findedRecipes []models.SimplifiedRecipe
-	
+
 	query := `
 		SELECT r.id, r.name, r.user_id
 		FROM recipes AS r
@@ -40,7 +39,6 @@ func (r *RecipesPostgres) GetRecipesByIngredients(ingredients []string) (*[]mode
 	}
 	defer rows.Close()
 
-
 	for rows.Next() {
 		var recipeId int
 		var recipeName string
@@ -48,12 +46,12 @@ func (r *RecipesPostgres) GetRecipesByIngredients(ingredients []string) (*[]mode
 
 		err := rows.Scan(&recipeId, &recipeName, &userId)
 		if err != nil {
-			return nil, err 
+			return nil, err
 		}
 
 		findedRecipes = append(findedRecipes, models.SimplifiedRecipe{
-			ID: recipeId, 
-			Name: recipeName,
+			ID:     recipeId,
+			Name:   recipeName,
 			UserID: userId,
 		})
 
@@ -116,7 +114,7 @@ func (r *RecipesPostgres) CreateRecipe(recipe models.Recipe, ingredients []model
 			if err != nil {
 				return 0, err
 			}
-			
+
 		} else if err != nil {
 			return 0, err
 		}
@@ -164,7 +162,7 @@ func (r *RecipesPostgres) GetAllRecipes() (*[]models.SimplifiedRecipe, error) {
 		}
 
 		simplifiedRecipes = append(simplifiedRecipes, models.SimplifiedRecipe{
-			ID: recipeId,
+			ID:     recipeId,
 			Name:   recipeName,
 			UserID: userID,
 		})
@@ -198,14 +196,14 @@ func (r *RecipesPostgres) GetRecipeById(id int) (models.FullRecipe, error) {
 
 	// Инициализация переменных для хранения данных
 	var (
-		recipeID             int
-		recipeName           string
-		recipeInstructions    string
-		userID               int
-		ingredientID         sql.NullInt64
-		ingredientName       sql.NullString
-		unitID               sql.NullInt64
-		quantity             sql.NullFloat64
+		recipeID           int
+		recipeName         string
+		recipeInstructions string
+		userID             int
+		ingredientID       sql.NullInt64
+		ingredientName     sql.NullString
+		unitID             sql.NullInt64
+		quantity           sql.NullFloat64
 	)
 
 	// Проходим по всем строкам результата
@@ -217,10 +215,10 @@ func (r *RecipesPostgres) GetRecipeById(id int) (models.FullRecipe, error) {
 
 		// Заполняем рецепт (без проверки на ID)
 		recipe.Recipe = models.Recipe{
-			ID:          recipeID,
-			Name:        recipeName,
+			ID:           recipeID,
+			Name:         recipeName,
 			Instructions: recipeInstructions,
-			UserID:      userID,
+			UserID:       userID,
 		}
 
 		// Если есть ингредиент, добавляем его
@@ -257,7 +255,7 @@ func (r *RecipesPostgres) SaveRecipeToProfile(userId, recipeId int) error {
 	return err
 }
 
-func (r *RecipesPostgres) GetSavedRecipes(userId int) ([]models.SavedRecipes,error) {
+func (r *RecipesPostgres) GetSavedRecipes(userId int) ([]models.SavedRecipes, error) {
 	query := fmt.Sprintf(`
 		SELECT r.id, r.name
 		FROM %s AS r
@@ -268,7 +266,7 @@ func (r *RecipesPostgres) GetSavedRecipes(userId int) ([]models.SavedRecipes,err
 
 	var recipes []models.SavedRecipes
 	err := r.db.Select(&recipes, query, userId)
-	if err != nil{
+	if err != nil {
 		return []models.SavedRecipes{}, err
 	}
 	return recipes, nil
@@ -370,7 +368,7 @@ func (r *RecipesPostgres) DeleteRecipe(userID, recipeID int) error {
 		DELETE FROM %s
 		WHERE id = $1
 		`, recipesTable)
-	
+
 	_, err = r.db.Exec(query, recipeID)
 	if err != nil {
 		return err
@@ -382,11 +380,9 @@ func (r *RecipesPostgres) DeleteRecipe(userID, recipeID int) error {
 func (r *RecipesPostgres) DeleteSavedRecipes(userId int, input []int) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE user_id = $1 AND recipe_id = ANY($2)", savedRecipesTable)
 	_, err := r.db.Exec(query, userId, pq.Array(input))
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
-
-

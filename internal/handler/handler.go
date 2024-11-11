@@ -1,23 +1,23 @@
 package handler
 
 import (
-	"github.com/Perceverance7/recipes/internal/service"
 	"github.com/Perceverance7/recipes/docs"
-	
+	"github.com/Perceverance7/recipes/internal/service"
+
 	"github.com/gin-gonic/gin"
-	"github.com/swaggo/gin-swagger"           
 	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-type Handler struct{
+type Handler struct {
 	services *service.Service
 }
 
-func NewHandler(services *service.Service) *Handler{
+func NewHandler(services *service.Service) *Handler {
 	return &Handler{services: services}
 }
 
-func (h *Handler) InitRoutes() *gin.Engine{
+func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
 	docs.SwaggerInfo.BasePath = "/"
@@ -47,4 +47,3 @@ func (h *Handler) InitRoutes() *gin.Engine{
 
 	return router
 }
-

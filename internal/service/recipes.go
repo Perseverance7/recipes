@@ -3,24 +3,24 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
+
+	"regexp"
+	"strings"
 
 	"github.com/Perceverance7/recipes/internal/models"
 	"github.com/Perceverance7/recipes/internal/repository"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
-
-	"errors"
-	"regexp"
-	"strings"
 )
 
-type RecipesService struct{
+type RecipesService struct {
 	repo repository.Recipe
-	rdb *redis.Client
+	rdb  *redis.Client
 }
 
-func NewRecipesService(repo repository.Recipe, rdb *redis.Client) *RecipesService{
+func NewRecipesService(repo repository.Recipe, rdb *redis.Client) *RecipesService {
 	return &RecipesService{repo: repo, rdb: rdb}
 }
 
@@ -46,7 +46,6 @@ func (s *RecipesService) CreateRecipe(recipe models.Recipe, ingredients []models
 
 	return s.repo.CreateRecipe(recipe, ingredients)
 }
-
 
 func (s *RecipesService) GetAllRecipes(ctx context.Context) (*[]models.SimplifiedRecipe, error) {
 	cacheKey := "all_recipes"
@@ -99,7 +98,7 @@ func (s *RecipesService) GetSavedRecipes(userId int) ([]models.SavedRecipes, err
 }
 
 func (s *RecipesService) UpdateRecipe(userID, recipeID int, updatedRecipe models.FullRecipe) error {
-	if len(updatedRecipe.Ingredients) < 1{
+	if len(updatedRecipe.Ingredients) < 1 {
 		return errors.New("recipe must have at least one ingredient")
 	}
 	return s.repo.UpdateRecipe(userID, recipeID, updatedRecipe)
@@ -117,7 +116,7 @@ func (s *RecipesService) GetRecipesByIngredients(ingredients string) (*[]models.
 
 func (s *RecipesService) DeleteSavedRecipes(userId int, input []int) error {
 
-	go func(){
+	go func() {
 		err := s.repo.DeleteSavedRecipes(userId, input)
 		if err != nil {
 			// Логируем ошибку, но не останавливаем основной поток

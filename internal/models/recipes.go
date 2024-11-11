@@ -8,39 +8,38 @@ type Unit struct {
 
 // Структура для таблицы Ingredients
 type Ingredient struct {
-	ID     int `json:"id"`
-	Name   string `json:"name" binding:"required"`
-	UnitID int `json:"unit_id" binding:"required"`
-	Quantity float32 `json:"quantity" binding:"required"` 
+	ID       int     `json:"id"`
+	Name     string  `json:"name" binding:"required"`
+	UnitID   int     `json:"unit_id" binding:"required"`
+	Quantity float32 `json:"quantity" binding:"required"`
 }
 
 // Структура для таблицы Recipes
 type Recipe struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name" binding:"required"`
+	ID           int    `json:"id"`
+	Name         string `json:"name" binding:"required"`
 	Instructions string `json:"instructions" binding:"required"`
-	UserID      int    `json:"user_id"` 
+	UserID       int    `json:"user_id"`
 }
 
 // Структура для таблицы RecipeIngredients (связь между рецептами и ингредиентами)
 type RecipeIngredient struct {
-	RecipeID    int     `json:"recipe_id"`
+	RecipeID     int     `json:"recipe_id"`
 	IngredientID int     `json:"ingredient_id"`
-	Quantity    float64 `json:"quantity"` 
+	Quantity     float64 `json:"quantity"`
 }
 
 // Структура для таблицы SavedRecipes (сохраненные рецепты пользователя)
 type SavedRecipe struct {
-	UserID   int       `json:"user_id"`   
-	RecipeID int       `json:"recipe_id"` 
+	UserID   int `json:"user_id"`
+	RecipeID int `json:"recipe_id"`
 }
 
 // --------------------------
 
-
 type SavedRecipes struct {
-	ID     int    `json:"id"`
-	Name   string `json:"name"`
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 type SimplifiedRecipe struct {
@@ -50,24 +49,24 @@ type SimplifiedRecipe struct {
 }
 
 type FullRecipe struct {
-	Recipe        Recipe            `json:"recipe"`
-	Ingredients  []Ingredient      `json:"ingredients"`
+	Recipe      Recipe       `json:"recipe"`
+	Ingredients []Ingredient `json:"ingredients"`
 }
 
 // ---------------------------
 
 type InputRecipe struct {
-	Name        string `json:"name" binding:"required"`
-	Instructions string `json:"instructions" binding:"required"` 
+	Name         string `json:"name" binding:"required"`
+	Instructions string `json:"instructions" binding:"required"`
 }
 
 type InputIngredient struct {
-	Name   string `json:"name" binding:"required"`
-	UnitID int `json:"unit_id" binding:"required"`
-	Quantity float32 `json:"quantity" binding:"required"` 
+	Name     string  `json:"name" binding:"required"`
+	UnitID   int     `json:"unit_id" binding:"required"`
+	Quantity float32 `json:"quantity" binding:"required"`
 }
 
 type InputFullRecipe struct {
-	Recipe InputRecipe
+	Recipe      InputRecipe
 	Ingredients []InputIngredient
 }

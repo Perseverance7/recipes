@@ -1,12 +1,13 @@
 package handler
 
 import (
-	"github.com/Perceverance7/recipes/internal/models"
-
 	"net/http"
+
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/Perceverance7/recipes/internal/models"
 )
 
 // @Summary createRecipe
@@ -21,7 +22,7 @@ import (
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/recipes/create [post]
-func (h *Handler) createRecipe(c *gin.Context){
+func (h *Handler) createRecipe(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
 		return
@@ -56,7 +57,7 @@ func (h *Handler) createRecipe(c *gin.Context){
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/recipes [get]
-func (h *Handler) getAllRecipes(c *gin.Context){
+func (h *Handler) getAllRecipes(c *gin.Context) {
 	fullRecipes, err := h.services.Recipe.GetAllRecipes(c.Request.Context())
 	if err != nil {
 		newErrorResponce(c, http.StatusInternalServerError, "Не удалось получить рецепты")
@@ -79,19 +80,19 @@ func (h *Handler) getAllRecipes(c *gin.Context){
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/recipes/{id} [post]
-func (h *Handler) SaveRecipeToProfile(c *gin.Context){
+func (h *Handler) SaveRecipeToProfile(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
 		return
 	}
 
 	recipeId, err := strconv.Atoi(c.Param("id"))
-	if err != nil{
+	if err != nil {
 		newErrorResponce(c, http.StatusBadRequest, "invalid id param")
 		return
 	}
 
-	if err := h.services.Recipe.SaveRecipeToProfile(userId, recipeId); err != nil{
+	if err := h.services.Recipe.SaveRecipeToProfile(userId, recipeId); err != nil {
 		newErrorResponce(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -111,20 +112,20 @@ func (h *Handler) SaveRecipeToProfile(c *gin.Context){
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/recipes/{id} [get]
-func (h *Handler) getRecipeById(c *gin.Context){
+func (h *Handler) getRecipeById(c *gin.Context) {
 
 	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil{
+	if err != nil {
 		newErrorResponce(c, http.StatusBadRequest, "invalid id param")
 		return
 	}
 
 	recipe, err := h.services.Recipe.GetRecipeById(id)
-	if err != nil{
+	if err != nil {
 		newErrorResponce(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	
+
 	if recipe == nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "recipe not found"})
 		return
@@ -144,14 +145,14 @@ func (h *Handler) getRecipeById(c *gin.Context){
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/recipes/saved [get]
-func (h *Handler) getSavedRecipes(c *gin.Context){
+func (h *Handler) getSavedRecipes(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
 		return
 	}
 
 	recipes, err := h.services.Recipe.GetSavedRecipes(userId)
-	if err != nil{
+	if err != nil {
 		newErrorResponce(c, http.StatusInternalServerError, err.Error())
 	}
 
@@ -171,25 +172,25 @@ func (h *Handler) getSavedRecipes(c *gin.Context){
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/recipes/{id} [put]
-func (h *Handler) updateRecipe(c *gin.Context){
+func (h *Handler) updateRecipe(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
 		return
 	}
 
 	recipeId, err := strconv.Atoi(c.Param("id"))
-	if err != nil{
+	if err != nil {
 		newErrorResponce(c, http.StatusBadRequest, "invalid id param")
 		return
 	}
 
 	var input models.FullRecipe
-	if err := c.BindJSON(&input); err != nil{
+	if err := c.BindJSON(&input); err != nil {
 		newErrorResponce(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err := h.services.Recipe.UpdateRecipe(userId, recipeId, input); err != nil{
+	if err := h.services.Recipe.UpdateRecipe(userId, recipeId, input); err != nil {
 		newErrorResponce(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -210,19 +211,19 @@ func (h *Handler) updateRecipe(c *gin.Context){
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/recipes/{id} [delete]
-func (h *Handler) deleteRecipe(c *gin.Context){
+func (h *Handler) deleteRecipe(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
 		return
 	}
 
 	recipeId, err := strconv.Atoi(c.Param("id"))
-	if err != nil{
+	if err != nil {
 		newErrorResponce(c, http.StatusBadRequest, "invalid id param")
 		return
 	}
 
-	if err := h.services.Recipe.DeleteRecipe(userId, recipeId); err != nil{
+	if err := h.services.Recipe.DeleteRecipe(userId, recipeId); err != nil {
 		newErrorResponce(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -231,7 +232,7 @@ func (h *Handler) deleteRecipe(c *gin.Context){
 }
 
 type IngredientsInput struct {
-    Ingredients string `json:"ingredients" binding:"required"`
+	Ingredients string `json:"ingredients" binding:"required"`
 }
 
 // @Summary getRecipeByIngredients
@@ -247,19 +248,19 @@ type IngredientsInput struct {
 // @Failure default {object} errorResponse
 // @Router /api/recipes/by-ingredients [post]
 func (h *Handler) getRecipesByIngredients(c *gin.Context) {
-    var input IngredientsInput
-    if err := c.BindJSON(&input); err != nil {
-        newErrorResponce(c, http.StatusBadRequest, err.Error())
-        return
-    }
+	var input IngredientsInput
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponce(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
-    recipes, err := h.services.Recipe.GetRecipesByIngredients(input.Ingredients)
-    if err != nil {
-        newErrorResponce(c, http.StatusInternalServerError, err.Error())
-        return
-    }
+	recipes, err := h.services.Recipe.GetRecipesByIngredients(input.Ingredients)
+	if err != nil {
+		newErrorResponce(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-    c.JSON(http.StatusOK, recipes)
+	c.JSON(http.StatusOK, recipes)
 }
 
 // @Summary deleteRecipesByIngredients
@@ -282,12 +283,12 @@ func (h *Handler) deleteSavedRecipes(c *gin.Context) {
 
 	var input []int
 
-	if err := c.BindJSON(&input); err != nil{
+	if err := c.BindJSON(&input); err != nil {
 		newErrorResponce(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err := h.services.Recipe.DeleteSavedRecipes(userId, input); err != nil{
+	if err := h.services.Recipe.DeleteSavedRecipes(userId, input); err != nil {
 		newErrorResponce(c, http.StatusInternalServerError, err.Error())
 		return
 	}
